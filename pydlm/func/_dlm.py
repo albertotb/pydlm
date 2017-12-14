@@ -371,7 +371,7 @@ class _dlm(object):
     # Note the following functions will modify the status of the model, so they
     # shall not be directly call through the main model if this behavior is not
     # desired.
-    
+
     # featureDict contains all the features for prediction.
     # It is a dictionary with key equals to the name of the component and
     # the value as the new feature (a list). The function
@@ -383,9 +383,9 @@ class _dlm(object):
     # used by _continuePredict.
     def _oneDayAheadPredict(self, date, featureDict=None):
         """ One day ahead prediction based on the date and the featureDict.
-        The prediction could be on the last day and into the future or in 
+        The prediction could be on the last day and into the future or in
         the middle of the time series and ignore the rest. For predicting into
-        the future, the new features must be supplied to featureDict. For 
+        the future, the new features must be supplied to featureDict. For
         prediction in the middle, the user can still supply the features which
         will be used priorily. The old features will be used if featureDict is
         None.
@@ -824,7 +824,7 @@ class _dlm(object):
 #====================== function for discount tuning =========================
     # get the mse from the model
     def _getMSE(self):
-        
+
         if not self.initialized:
             raise NameError('need to fit the model first')
 
@@ -843,7 +843,7 @@ class _dlm(object):
 
     # get the discount from the model
     def _getDiscounts(self):
-        
+
         if not self.initialized:
             raise NameError('need to fit the model before one can' +
                             'fetch the discount factors')

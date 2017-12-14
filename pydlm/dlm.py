@@ -76,6 +76,7 @@ class dlm(_dlm):
     # define the basic members
     # initialize the result
     def __init__(self, data, **options):
+        print("Hello from dlm")
         super(dlm, self).__init__(data, **options)
 
         # indicate whether the plot modules has been loaded.
@@ -270,11 +271,11 @@ class dlm(_dlm):
         """ One day ahead predict based on the current data.
 
         The predict result is based on all the data before date and predict the
-        observation at date + days. 
+        observation at date + days.
 
-        The prediction could be on the last day and into the future or in 
+        The prediction could be on the last day and into the future or in
         the middle of the time series and ignore the rest. For predicting into
-        the future, the new features must be supplied to featureDict. For 
+        the future, the new features must be supplied to featureDict. For
         prediction in the middle, the user can still supply the features which
         will be used priorily. The old features will be used if featureDict is
         None.
@@ -306,7 +307,7 @@ class dlm(_dlm):
         self._predictModel = predictModel
         return self._predictModel._oneDayAheadPredict(date=date,
                                                       featureDict=featureDict)
-        
+
     def continuePredict(self, featureDict=None):
         """ Continue prediction after the one-day ahead predict.
 
@@ -341,7 +342,7 @@ class dlm(_dlm):
         """ N day ahead prediction based on the current data.
 
         This function is a convenient wrapper of predict() and
-        continuePredict(). If the prediction is into the future, i.e, > n, 
+        continuePredict(). If the prediction is into the future, i.e, > n,
         the featureDict has to contain all feature vectors for multiple days
         for each dynamic component. For example, assume myDLM has a component
         named 'spy' which posseses two dimensions,
@@ -686,7 +687,7 @@ class dlm(_dlm):
         # initialize the model to ease the modification
         if not self.initialized:
             self._initialize()
-            
+
         # if we are adding new data to the time series
         if component == 'main':
             # add the data to the self.data
@@ -1154,7 +1155,7 @@ class dlm(_dlm):
             options=self.options)
 
         dlmPlot.plotout()
-                               
+
 # ================================ control options =========================
 
     def showOptions(self):
@@ -1256,7 +1257,7 @@ class dlm(_dlm):
             global dlmPlot
             import pydlm.plot.dlmPlot as dlmPlot
             self.plotLibLoaded = True
-            
+
 # ========================= tuning and evaluation =========================
     def getMSE(self):
         """ Get the one-day ahead prediction mean square error. The mse is
@@ -1269,12 +1270,12 @@ class dlm(_dlm):
         return self._getMSE()
 
     def tune(self, maxit=100):
-        """ Automatic tuning of the discounting factors. 
+        """ Automatic tuning of the discounting factors.
 
         The method will call the model tuner class to use the default parameters
         to tune the discounting factors and change the discount factor permenantly.
         User needs to refit the model after tuning.
-        
+
         If user wants a more refined tuning and not change any property of the
         existing model, they should opt to use the @modelTuner class.
         """
@@ -1283,10 +1284,10 @@ class dlm(_dlm):
         if self._printInfo:
             self.fitForwardFilter()
             print("The current mse is " + str(self.getMSE()) + '.')
-        
+
         simpleTuner.tune(untunedDLM=self, maxit=maxit)
         self._setDiscounts(simpleTuner.getDiscounts(), change_component=True)
-        
+
         if self._printInfo:
             self.fitForwardFilter()
             print("The new mse is " + str(self.getMSE()) + '.')
