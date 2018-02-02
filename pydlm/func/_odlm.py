@@ -80,6 +80,8 @@ class _odlm(object):
         self.time = None
         self._printInfo = options.get('printInfo', True)
 
+        self._printSystemInfo(False)
+
     # an inner class to store all options
     class _defaultOptions(object):
         """ All plotting and fitting options
@@ -202,7 +204,7 @@ class _odlm(object):
                    only carry information 1%, so we ignore
                    these days and refit the model to aid stability.
         """
-        print(start, end)
+        #print(start, end)
         # the default value for end
         if end is None:
             end = self.n - 1
@@ -241,14 +243,14 @@ class _odlm(object):
                 self._resetModelStatus()
                 for innerStep in range(step - int(self.builder.renewTerm),
                                        step):
-                    print(self.data[innerStep])
+                    #print(self.data[innerStep])
                     self.Filter.forwardFilter(self.builder.model,
                                               self.data[innerStep])
                 lastRenewPoint = step
 
             # then we use the updated model to filter the state
-            print(step)
-            print(self.data[step])
+            #print(step)
+            #print(self.data[step])
             self.Filter.forwardFilter(self.builder.model, self.data[step])
 
             # extract the result and record
@@ -411,8 +413,8 @@ class _odlm(object):
         Returns:
             A tuple of (predicted_mean, predicted_variance)
         """
-        print(date)
-        print(self.result.filteredSteps)
+        #print(date)
+        #print(self.result.filteredSteps)
 
         if date > self.n - 1:
             raise NameError('The date is beyond the data range.')
@@ -466,8 +468,10 @@ class _odlm(object):
                 feature = self.result.predictStatus[2][-comp.d:]
             else:
                 extra = comp.d - len(self.result.predictStatus[2])
-                feature = self.data[(startDate - extra + 1):
-                                    (startDate + 1)] + self.result.predictStatus[2]
+                #feature = self.data[(startDate - extra + 1):
+                #                    (startDate + 1)] + self.result.predictStatus[2]
+                feature = [self.data[k] for k in range(startDate - extra + 1,
+                           startDate + 1)] + self.result.predictStatus[2]
             if featureDict is None:
                 featureDict = {}
             featureDict[name] = feature
@@ -563,6 +567,17 @@ class _odlm(object):
         """
 
         if filterType == 'forwardFilter':
+            for i in range(step):
+                result.filteredObs[i] = None
+                result.predictedObs[i] = None
+                result.filteredObsVar[i] = None
+                result.predictedObsVar[i] = None
+                result.filteredState[i] = None
+                result.predictedState[i] = None
+                result.filteredCov[i] = None
+                result.predictedCov[i] = None
+                result.noiseVar[i] = None
+                result.df[i] = None
             result.filteredObs[step] = model.obs
             result.predictedObs[step] = model.prediction.obs
             result.filteredObsVar[step] = model.obsVar
@@ -833,23 +848,23 @@ class _odlm(object):
 
 #====================== function for discount tuning =========================
     # get the mse from the model
-    def _getMSE(self):
-
-        if not self.initialized:
-            raise NameError('need to fit the model first')
-
-        if self.result.filteredSteps[1] == -1:
-            raise NameError('need to run forward filter first')
-
-        mse = 0
-        for i in range(self.result.filteredSteps[0],
-                       self.result.filteredSteps[1] + 1):
-            if self.data[i] is not None:
-                mse += (self.data[i] - self.result.predictedObs[i]) ** 2
-
-        mse = mse / (self.result.filteredSteps[1] + 1 -
-                      self.result.filteredSteps[0])
-        return mse[0,0]
+    # def _getMSE(self):
+    #
+    #     if not self.initialized:
+    #         raise NameError('need to fit the model first')
+    #
+    #     if self.result.filteredSteps[1] == -1:
+    #         raise NameError('need to run forward filter first')
+    #
+    #     mse = 0
+    #     for i in range(self.result.filteredSteps[0],
+    #                    self.result.filteredSteps[1] + 1):
+    #         if self.data[i] is not None:
+    #             mse += (self.data[i] - self.result.predictedObs[i]) ** 2
+    #
+    #     mse = mse / (self.result.filteredSteps[1] + 1 -
+    #                   self.result.filteredSteps[0])
+    #     return mse[0,0]
 
     # get the discount from the model
     def _getDiscounts(self):

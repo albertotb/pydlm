@@ -76,7 +76,6 @@ class odlm(_odlm):
     # define the basic members
     # initialize the result
     def __init__(self, data, **options):
-        print("Hello from dlmOnline")
         super(odlm, self).__init__(data, **options)
 
         # indicate whether the plot modules has been loaded.
@@ -152,7 +151,7 @@ class odlm(_odlm):
             windowLength: the length of the rolling window if used.
 
         """
-        print(self.data)
+        #print(self.data)
         # check if the feature size matches the data size
         self._checkFeatureSize()
 
@@ -394,6 +393,9 @@ class odlm(_odlm):
             (obs, var) = self.continuePredict(featureDict=featureDictOneDay)
             predictedObs.append(obs)
             predictedVar.append(var)
+
+        self._predictModel = None
+
         return (self._1DmatrixToArray(predictedObs),
                 self._1DmatrixToArray(predictedVar))
 
@@ -494,40 +496,40 @@ class odlm(_odlm):
         return self._getComponentVar(name=name, filterType=filterType,
                                      start=start, end=(end - 1))
 
-    def getResidual(self, filterType='forwardFilter'):
-        """ get the residuals for data after filtering or smoothing.
-
-        If the working dates are not (0, self.n - 1),
-        then a warning will prompt stating the actual filtered dates.
-
-        Args:
-            filterType: the type of residuals to be returned. Could be
-                        'forwardFilter', 'backwardSmoother', and 'predict'.
-                        Default to 'forwardFilter'.
-
-        Returns:
-            A list of residuals based on the choice
-
-        """
-        # get the working date
-        start, end = self._checkAndGetWorkingDates(filterType=filterType)
-        end += 1 # To get the result for the last date.
-        # get the mean for the fitlered data
-        # get out of the matrix form
-        if filterType == 'forwardFilter':
-            return self._1DmatrixToArray(
-                [self.data[i] - self.result.filteredObs[i]
-                 for i in range(start, end)])
-        elif filterType == 'backwardSmoother':
-            return self._1DmatrixToArray(
-                [self.data[i] - self.result.smoothedObs[i]
-                 for i in range(start, end)])
-        elif filterType == 'predict':
-            return self._1DmatrixToArray(
-                [self.data[i] - self.result.predictedObs[i]
-                 for i in range(start, end)])
-        else:
-            raise NameError('Incorrect filter type.')
+    # def getResidual(self, filterType='forwardFilter'):
+    #     """ get the residuals for data after filtering or smoothing.
+    #
+    #     If the working dates are not (0, self.n - 1),
+    #     then a warning will prompt stating the actual filtered dates.
+    #
+    #     Args:
+    #         filterType: the type of residuals to be returned. Could be
+    #                     'forwardFilter', 'backwardSmoother', and 'predict'.
+    #                     Default to 'forwardFilter'.
+    #
+    #     Returns:
+    #         A list of residuals based on the choice
+    #
+    #     """
+    #     # get the working date
+    #     start, end = self._checkAndGetWorkingDates(filterType=filterType)
+    #     end += 1 # To get the result for the last date.
+    #     # get the mean for the fitlered data
+    #     # get out of the matrix form
+    #     if filterType == 'forwardFilter':
+    #         return self._1DmatrixToArray(
+    #             [self.data[i] - self.result.filteredObs[i]
+    #              for i in range(start, end)])
+    #     elif filterType == 'backwardSmoother':
+    #         return self._1DmatrixToArray(
+    #             [self.data[i] - self.result.smoothedObs[i]
+    #              for i in range(start, end)])
+    #     elif filterType == 'predict':
+    #         return self._1DmatrixToArray(
+    #             [self.data[i] - self.result.predictedObs[i]
+    #              for i in range(start, end)])
+    #     else:
+    #         raise NameError('Incorrect filter type.')
 
     def getInterval(self, p=0.95, filterType='forwardFilter', name='main'):
         """ get the confidence interval for data or component.
@@ -724,114 +726,114 @@ class odlm(_odlm):
         self._clean()
 
     # pop the data of a specific date out
-    def popout(self, date):
-        """ Pop out the data for a given date
-
-        Args:
-            date: the index indicates which date to be popped out.
-
-        """
-        if date < 0 or date > self.n - 1:
-            raise NameError('The date should be between 0 and ' +
-                            str(self.n - 1))
-
-        # initialize the model to ease the modification
-        if not self.initialized:
-            self._initialize()
-
-        # pop out the data at date
-        self.data.pop(date)
-        self.n -= 1
-
-        # pop out the feature at date
-        for name in self.builder.dynamicComponents:
-            comp = self.builder.dynamicComponents[name]
-            comp.popout(date)
-
-        # pop out the results at date
-        self.result._popout(date)
-
-        # update the filtered and the smoothed steps
-        self.result.filteredSteps[1] = date - 1
-        self.result.smoothedSteps[1] = date - 1
-
-        if self.result.filteredSteps[0] > self.result.filteredSteps[1]:
-            self.result.filteredSteps = [0, -1]
-            self.result.smoothedSteps = [0, -1]
-
-        elif self.result.smoothedSteps[0] > self.result.smoothedSteps[1]:
-            self.result.smoothedSteps = [0, -1]
-
-        # reset everything that needs reset
-        self._clean()
+    # def popout(self, date):
+    #     """ Pop out the data for a given date
+    #
+    #     Args:
+    #         date: the index indicates which date to be popped out.
+    #
+    #     """
+    #     if date < 0 or date > self.n - 1:
+    #         raise NameError('The date should be between 0 and ' +
+    #                         str(self.n - 1))
+    #
+    #     # initialize the model to ease the modification
+    #     if not self.initialized:
+    #         self._initialize()
+    #
+    #     # pop out the data at date
+    #     self.data.pop(date)
+    #     self.n -= 1
+    #
+    #     # pop out the feature at date
+    #     for name in self.builder.dynamicComponents:
+    #         comp = self.builder.dynamicComponents[name]
+    #         comp.popout(date)
+    #
+    #     # pop out the results at date
+    #     self.result._popout(date)
+    #
+    #     # update the filtered and the smoothed steps
+    #     self.result.filteredSteps[1] = date - 1
+    #     self.result.smoothedSteps[1] = date - 1
+    #
+    #     if self.result.filteredSteps[0] > self.result.filteredSteps[1]:
+    #         self.result.filteredSteps = [0, -1]
+    #         self.result.smoothedSteps = [0, -1]
+    #
+    #     elif self.result.smoothedSteps[0] > self.result.smoothedSteps[1]:
+    #         self.result.smoothedSteps = [0, -1]
+    #
+    #     # reset everything that needs reset
+    #     self._clean()
 
     # alter the data of a specific days
-    def alter(self, date, data, component='main'):
-        """ To alter the data for a specific date and a specific component.
-
-        Args:
-            date: the date of the altering data
-            data: the new data. data must be a numeric value for main time
-                  series and must be a list of numerical values for dynamic
-                  components.
-            component: the component for which the new data need to be
-                       supplied to.\n
-                       'main': the main time series data\n
-                       other component name: other component feature data
-
-        """
-        if date < 0 or date > self.n - 1:
-            raise NameError('The date should be between 0 and ' +
-                            str(self.n - 1))
-
-        # initialize the model to ease the modification
-        if not self.initialized:
-            self._initialize()
-
-        # to alter the data for the observed chain
-        if component == 'main':
-            self.data[date] = data
-
-            # we also automatically alter all the automatic components
-            for component in self.builder.automaticComponents:
-                comp = self.builder.automaticComponents[component]
-                comp.alter(date, data)
-
-        # to alter the feature of a component
-        elif component in self.builder.dynamicComponents:
-            comp = self.builder.dynamicComponents[component]
-            comp.alter(date, data)
-
-        else:
-            raise NameError('Such dynamic component does not exist.')
-
-        # update the filtered and the smoothed steps
-        self.result.filteredSteps[1] = date - 1
-        self.result.smoothedSteps[1] = date - 1
-
-        if self.result.filteredSteps[0] > self.result.filteredSteps[1]:
-            self.result.filteredSteps = [0, -1]
-            self.result.smoothedSteps = [0, -1]
-
-        elif self.result.smoothedSteps[0] > self.result.smoothedSteps[1]:
-            self.result.smoothedSteps = [0, -1]
-
-        # reset everything that needs reset
-        self._clean()
-
-    # ignore the data of a given date
-    def ignore(self, date):
-        """ Ignore the data for a specific day. treat it as missing data
-
-        Args:
-            date: the date to ignore.
-
-        """
-        if date < 0 or date > self.n - 1:
-            raise NameError('The date should be between 0 and ' +
-                            str(self.n - 1))
-
-        self.alter(date=date, data=None, component='main')
+    # def alter(self, date, data, component='main'):
+    #     """ To alter the data for a specific date and a specific component.
+    #
+    #     Args:
+    #         date: the date of the altering data
+    #         data: the new data. data must be a numeric value for main time
+    #               series and must be a list of numerical values for dynamic
+    #               components.
+    #         component: the component for which the new data need to be
+    #                    supplied to.\n
+    #                    'main': the main time series data\n
+    #                    other component name: other component feature data
+    #
+    #     """
+    #     if date < 0 or date > self.n - 1:
+    #         raise NameError('The date should be between 0 and ' +
+    #                         str(self.n - 1))
+    #
+    #     # initialize the model to ease the modification
+    #     if not self.initialized:
+    #         self._initialize()
+    #
+    #     # to alter the data for the observed chain
+    #     if component == 'main':
+    #         self.data[date] = data
+    #
+    #         # we also automatically alter all the automatic components
+    #         for component in self.builder.automaticComponents:
+    #             comp = self.builder.automaticComponents[component]
+    #             comp.alter(date, data)
+    #
+    #     # to alter the feature of a component
+    #     elif component in self.builder.dynamicComponents:
+    #         comp = self.builder.dynamicComponents[component]
+    #         comp.alter(date, data)
+    #
+    #     else:
+    #         raise NameError('Such dynamic component does not exist.')
+    #
+    #     # update the filtered and the smoothed steps
+    #     self.result.filteredSteps[1] = date - 1
+    #     self.result.smoothedSteps[1] = date - 1
+    #
+    #     if self.result.filteredSteps[0] > self.result.filteredSteps[1]:
+    #         self.result.filteredSteps = [0, -1]
+    #         self.result.smoothedSteps = [0, -1]
+    #
+    #     elif self.result.smoothedSteps[0] > self.result.smoothedSteps[1]:
+    #         self.result.smoothedSteps = [0, -1]
+    #
+    #     # reset everything that needs reset
+    #     self._clean()
+    #
+    # # ignore the data of a given date
+    # def ignore(self, date):
+    #     """ Ignore the data for a specific day. treat it as missing data
+    #
+    #     Args:
+    #         date: the date to ignore.
+    #
+    #     """
+    #     if date < 0 or date > self.n - 1:
+    #         raise NameError('The date should be between 0 and ' +
+    #                         str(self.n - 1))
+    #
+    #     self.alter(date=date, data=None, component='main')
 
 # ============================= plot component =========================
 
@@ -1264,35 +1266,35 @@ class odlm(_odlm):
             self.plotLibLoaded = True
 
 # ========================= tuning and evaluation =========================
-    def getMSE(self):
-        """ Get the one-day ahead prediction mean square error. The mse is
-        estimated only for days that has been predicted.
+    # def getMSE(self):
+    #     """ Get the one-day ahead prediction mean square error. The mse is
+    #     estimated only for days that has been predicted.
+    #
+    #     Returns:
+    #         An numerical value
+    #     """
+    #
+    #     return self._getMSE()
 
-        Returns:
-            An numerical value
-        """
-
-        return self._getMSE()
-
-    def tune(self, maxit=100):
-        """ Automatic tuning of the discounting factors.
-
-        The method will call the model tuner class to use the default parameters
-        to tune the discounting factors and change the discount factor permenantly.
-        User needs to refit the model after tuning.
-
-        If user wants a more refined tuning and not change any property of the
-        existing model, they should opt to use the @modelTuner class.
-        """
-        simpleTuner = modelTuner()
-
-        if self._printInfo:
-            self.fitForwardFilter()
-            print("The current mse is " + str(self.getMSE()) + '.')
-
-        simpleTuner.tune(untunedDLM=self, maxit=maxit)
-        self._setDiscounts(simpleTuner.getDiscounts(), change_component=True)
-
-        if self._printInfo:
-            self.fitForwardFilter()
-            print("The new mse is " + str(self.getMSE()) + '.')
+    # def tune(self, maxit=100):
+    #     """ Automatic tuning of the discounting factors.
+    #
+    #     The method will call the model tuner class to use the default parameters
+    #     to tune the discounting factors and change the discount factor permenantly.
+    #     User needs to refit the model after tuning.
+    #
+    #     If user wants a more refined tuning and not change any property of the
+    #     existing model, they should opt to use the @modelTuner class.
+    #     """
+    #     simpleTuner = modelTuner()
+    #
+    #     if self._printInfo:
+    #         self.fitForwardFilter()
+    #         print("The current mse is " + str(self.getMSE()) + '.')
+    #
+    #     simpleTuner.tune(untunedDLM=self, maxit=maxit)
+    #     self._setDiscounts(simpleTuner.getDiscounts(), change_component=True)
+    #
+    #     if self._printInfo:
+    #         self.fitForwardFilter()
+    #         print("The new mse is " + str(self.getMSE()) + '.')

@@ -76,7 +76,6 @@ class dlm(_dlm):
     # define the basic members
     # initialize the result
     def __init__(self, data, **options):
-        print("Hello from dlm")
         super(dlm, self).__init__(data, **options)
 
         # indicate whether the plot modules has been loaded.
