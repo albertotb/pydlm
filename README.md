@@ -14,6 +14,8 @@ Modification of the original DLM class that does not store the values of the tim
  * `getResidual()`: get residuals
  * `tune()`: tune optimal discount given data
  * `_getMSE()`: low level method to compute MSE
+ 
+Note (08/07/2019): this functionality is now provided by [pydlm-lite](https://github.com/wwrechard/pydlm-lite)
 
 
 Updates in the github version
