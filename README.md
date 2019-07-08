@@ -6,7 +6,7 @@ Welcome to [pydlm](https://pydlm.github.io/), a flexible time series modeling li
 
 O(nline) DLM
 ------------------------------------------
-Modification of the original DLM class that does not store the values of the time series. This makes the memory footprint of the object constant, and does not grow with the number of elements (contrary to DLM, see `test.py` for an example). Not saving the values of the time series limits the functionality of the model. In particular, the list of methods not supported buy ODLM includes (but it may not be limited to):
+Modification of the original DLM class that does not store the values of the time series. This makes the memory footprint of the object constant, and does not grow with the number of elements (contrary to DLM, see `test.py` for an example). Not saving the values of the time series limits the functionality of the model. In particular, the list of methods not supported by ODLM includes (but it may not be limited to):
 
  * `alter()`: modify data in place
  * `ignore()`: ignore date for timestamp
