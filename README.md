@@ -4,6 +4,18 @@
 
 Welcome to [pydlm](https://pydlm.github.io/), a flexible time series modeling library for python. This library is based on the Bayesian dynamic linear model (Harrison and West, 1999) and optimized for fast model fitting and inference.
 
+O(nline) DLM
+------------------------------------------
+Modification of the original DLM class that does not store the values of the time series. This makes the memory footprint of the object constant, and does not grow with the number of elements (contrary to DLM, see `test.py` for an example). Not saving the values of the time series limits the functionality of the model. In particular, the list of methods not supported buy ODLM includes (but it may not be limited to):
+
+ * `alter()`: modify data in place
+ * `ignore()`: ignore date for timestamp
+ * `getMSE()`: compute MSE
+ * `getResidual()`: get residuals
+ * `tune()`: tune optimal discount given data
+ * `_getMSE()`: low level method to compute MSE
+
+
 Updates in the github version
 -------------------------------------------
 * Add an auto noise initializer which initializes the model noise according to the scale of the time series. It is proved to improve the model performance over small scale data. To use auto initializer, simply call `dlm.noisePrior()` after constructing the model.
